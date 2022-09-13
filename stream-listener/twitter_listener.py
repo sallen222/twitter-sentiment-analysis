@@ -3,20 +3,12 @@ from dotenv import load_dotenv
 import os
 from kinesis_helper import KinesisStream
 
-# Loading environment variables
+# Loading bearer token from .env file
 load_dotenv()
-api_key = os.getenv('api_key')
-api_secret = os.getenv('api_secret')
-access_token = os.getenv('access_token')
-access_secret = os.getenv('access_secret')
 bearer_token= os.getenv('bearer_token')
 
-client = tweepy.Client(bearer_token, api_key, api_secret, access_token, access_secret)
-
-auth = tweepy.OAuth1UserHandler(api_key, api_secret, access_token, access_secret)
-api = tweepy.API(auth)
 # Name of the AWS Kinesis stream
-# streamName = "twitter-stream"
+streamName = "twitter-stream"
 
 class MyStream(tweepy.StreamingClient):
     # NOT CORRECT
@@ -26,6 +18,9 @@ class MyStream(tweepy.StreamingClient):
 
     def on_tweet(self, tweet):
         print(tweet.text)
+        #outputData = {'': 'data'}
+        #stream = KinesisStream(streamName)
+        #stream.send_stream(data=outputData)
         return True
 
     def on_error(self, status):
@@ -38,17 +33,19 @@ class MyStream(tweepy.StreamingClient):
             return False
 
 # Placeholder tracking keyword
-searchTerm = ""
+searchTerm = "fetterman"
 
-rule = tweepy.StreamRule((f"{searchTerm} lang:en"))
+rule = tweepy.StreamRule((f"{searchTerm} lang:en -is:retweet -is:reply"))
 
 stream = MyStream(bearer_token=bearer_token)
-print(stream.get_rules())
+
 
 if stream.get_rules()[3]['result_count'] != 0:
         n_rules = stream.get_rules()[0]
         ids = [n_rules[i_tuple[0]][2] for i_tuple in enumerate(n_rules)]
+        print("Deleting rules")
         stream.delete_rules(ids)
-        stream.add_rules(rule)
 
+stream.add_rules(rule)
+print(stream.get_rules())
 stream.filter()
