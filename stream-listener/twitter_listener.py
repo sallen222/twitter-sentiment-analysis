@@ -27,13 +27,14 @@ class MyStream(tweepy.StreamingClient):
         print(status)
         # Stops stream if rate limit is reached (status code 420)
         if status == 420:
+            print("Rate limit reached. Stopping stream.")
             return False
         if status == 401:
-            print("Authentication Error")
+            print("Authentication Error. Stopping stream.")
             return False
 
 # Placeholder tracking keyword
-searchTerm = "fetterman"
+searchTerm = ""
 
 rule = tweepy.StreamRule((f"{searchTerm} lang:en -is:retweet -is:reply"))
 
@@ -43,9 +44,9 @@ stream = MyStream(bearer_token=bearer_token)
 if stream.get_rules()[3]['result_count'] != 0:
         n_rules = stream.get_rules()[0]
         ids = [n_rules[i_tuple[0]][2] for i_tuple in enumerate(n_rules)]
-        print("Deleting rules")
+        print("Deleting old rules...")
         stream.delete_rules(ids)
 
 stream.add_rules(rule)
-print(stream.get_rules())
+
 stream.filter()
