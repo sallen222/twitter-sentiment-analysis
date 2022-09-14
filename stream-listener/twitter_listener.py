@@ -21,6 +21,7 @@ if __name__ == "__main__":
     params = parse_arg()
     global searchTerm
     searchTerm = params['keyword']
+
 # Loading bearer token from .env file
 load_dotenv()
 bearer_token= os.getenv('bearer_token')
@@ -29,7 +30,6 @@ print(searchTerm)
 streamName = "twitter-stream"
 
 class MyStream(tweepy.StreamingClient):
-    # NOT CORRECT
 
     def on_connect(self):
         print("Connected to Twitter API.")
