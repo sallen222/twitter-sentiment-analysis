@@ -20,7 +20,7 @@ class KinesisStream(object):
                             aws_access_key_id=awsAccessKey,
                             aws_secret_access_key=awsSecretKey)
 
-    def send_stream(self, data, partition_key=None):
+    def send_stream(self, data, partition_key="biden"):
         """
         data: python dict containing your data.
         partition_key:  set it to some fixed value if you want processing order
