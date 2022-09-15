@@ -1,1 +1,10 @@
 *.pem
+.env
+__pycache__
+.pytest_cache
+.infracost
+.terraform
+.terraform.lock.hcl
+*.tfvars
+*.tfstate
+*.tfstate.backup
