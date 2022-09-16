@@ -28,6 +28,10 @@ resource "aws_instance" "listener-instance" {
   key_name             = aws_key_pair.key-pair.key_name
   iam_instance_profile = aws_iam_instance_profile.ec2-instance-profile.name
 
+  subnet_id = aws_subnet.subnet-1.id
+
+  security_groups = [aws_security_group.twitter-sg.id]
+
   user_data = <<EOF
     #!/bin/bash
     sudo apt-get update && sudo apt-get upgrade -y
@@ -45,12 +49,18 @@ resource "aws_iam_policy" "ec2-policy" {
   "Version": "2012-10-17",
   "Statement": [
     {
-      "Sid": "Stmt1663164699427",
       "Action": [
         "kinesis:PutRecord"
       ],
       "Effect": "Allow",
       "Resource": "${aws_kinesis_stream.twitter-stream.arn}"
+    },
+    {
+      "Action": [
+        "ssm:GetParameter"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
     }
   ]
 }
@@ -73,13 +83,17 @@ resource "aws_iam_role" "ec2-role" {
   assume_role_policy = data.aws_iam_policy_document.ec2-assume-role-policy.json
 }
 
-resource "aws_iam_role_policy_attachment" "ec2-role-policy-attachment" {
+resource "aws_iam_role_policy_attachment" "kinesis-role-policy-attachment" {
   role       = aws_iam_role.ec2-role.name
   policy_arn = aws_iam_policy.ec2-policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "ssm-role-policy-attachment" {
+  role       = aws_iam_role.ec2-role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 resource "aws_iam_instance_profile" "ec2-instance-profile" {
   name = "ec2-instance-profile"
   role = aws_iam_role.ec2-role.name
-
 }

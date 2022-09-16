@@ -1,7 +1,3 @@
-variable "twitter-keyword" {
-  type = string
-}
-
 variable "key-name" {
   type = string
 }

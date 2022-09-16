@@ -15,7 +15,7 @@ resource "aws_kinesis_firehose_delivery_stream" "twitter-firehose" {
     role_arn   = aws_iam_role.firehose-role.arn
     bucket_arn = aws_s3_bucket.source-bucket.arn
 
-    # Example prefix using partitionKeyFromQuery, applicable to JQ processor
+    # prefix using partitionkey from query
     prefix              = "data/key=!{partitionKeyFromQuery:key}/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/hour=!{timestamp:HH}/"
     error_output_prefix = "errors/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/hour=!{timestamp:HH}/!{firehose:error-output-type}/"
 
@@ -27,7 +27,7 @@ resource "aws_kinesis_firehose_delivery_stream" "twitter-firehose" {
     processing_configuration {
       enabled = "true"
 
-      # JQ processor example
+      # JQ processor
       processors {
         type = "MetadataExtraction"
         parameters {
