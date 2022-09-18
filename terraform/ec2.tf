@@ -36,8 +36,12 @@ resource "aws_instance" "listener-instance" {
     #!/bin/bash
     sudo apt-get update && sudo apt-get upgrade -y
     sudo apt-get install python3 python3-pip git -y
-    sudo pip3 install tweepy boto3 
-    git clone https://github.com/sallen222/twitter-sentiment-analysis
+    sudo apt-get install python3-pip -y
+    sudo apt-get install git -y
+    sudo pip3 install tweepy boto3 dotenv
+    git clone https://github.com/sallen222/twitter-sentiment-analysis /home/ubuntu/twitter-sentiment-analysis
+    cd /home/ubuntu/twitter-sentiment-analysis
+
     
 EOF
 }

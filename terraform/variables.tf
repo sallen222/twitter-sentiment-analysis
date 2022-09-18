@@ -5,7 +5,3 @@ variable "key-name" {
 variable "twitter-bearer-token" {
   type = string
 }
-
-variable "" {
-  
-}
