@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-from sqlite3 import Timestamp
 import tweepy
 from dotenv import load_dotenv
 import os
