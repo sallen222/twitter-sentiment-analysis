@@ -4,7 +4,7 @@ variable "aws-access-key" {
 
 variable "aws-secret-key" {
   type = string
-  
+
 }
 
 variable "key-name" {

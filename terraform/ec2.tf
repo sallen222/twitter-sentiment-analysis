@@ -54,10 +54,10 @@ resource "aws_iam_policy" "ec2-policy" {
   "Statement": [
     {
       "Action": [
-        "kinesis:PutRecord"
+        "s3:PutObject"
       ],
       "Effect": "Allow",
-      "Resource": "${aws_kinesis_stream.twitter-stream.arn}"
+      "Resource": "*"
     },
     {
       "Action": [
