@@ -18,11 +18,12 @@ def lambda_handler(event, context):
 
     tweetKey = objectContent['key']
     tweetContent = objectContent['content']
+    tweetTimestamp = objectContent['timestamp']
 
     sentiment=comprehendClient.detect_sentiment(Text=tweetContent,LanguageCode='en')['Sentiment']
     print("SENTIMENT =" + sentiment)
 
-    output = {'key': f'{tweetKey}', 'content': f'{tweetContent}', 'sentiment': f'{sentiment}'}
+    output = {'key': f'{tweetKey}', 'content': f'{tweetContent}', 'sentiment': f'{sentiment}', 'timestamp': f'{tweetTimestamp}'}
 
     putBucket = s3Resource.Bucket('sallen-sentiment-destination-bucket')
 

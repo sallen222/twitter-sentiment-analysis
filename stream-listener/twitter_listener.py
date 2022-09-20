@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+from sqlite3 import Timestamp
 import tweepy
 from dotenv import load_dotenv
 import os
@@ -36,6 +37,7 @@ else:
     load_dotenv()
     bearer_token= os.getenv('bearer_token')
 
+# Tweepy stream listener
 class MyStream(tweepy.StreamingClient):
 
     def on_connect(self):
@@ -43,7 +45,8 @@ class MyStream(tweepy.StreamingClient):
 
     def on_tweet(self, tweet):
         tweet = transform(tweet.text)
-        output = {'key': f'{searchTerm}', 'content': f'{tweet}'}
+        timestamp = tweet.created_at
+        output = {'key': f'{searchTerm}', 'content': f'{tweet}' , 'timestamp': f'{timestamp}'}
         print("--------------------")
         print(output)
         s3_upload('sallen-sentiment-source-bucket', searchTerm, output)
@@ -62,7 +65,6 @@ class MyStream(tweepy.StreamingClient):
 rule = tweepy.StreamRule((f"{searchTerm} lang:en -is:retweet -is:reply"))
 
 stream = MyStream(bearer_token=bearer_token)
-
 
 if stream.get_rules()[3]['result_count'] != 0:
         n_rules = stream.get_rules()[0]
