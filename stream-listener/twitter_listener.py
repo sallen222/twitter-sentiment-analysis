@@ -8,6 +8,7 @@ from text_transform import transform
 import argparse
 import boto3
 from s3_upload import s3_upload
+import json
 # parse keyword to search from command
 def parse_arg():    
     parser = argparse.ArgumentParser()    
@@ -43,13 +44,14 @@ class MyStream(tweepy.StreamingClient):
     def on_connect(self):
         print('Connected to Twitter API.')
 
-    def on_tweet(self, tweet):
-        tweet = transform(tweet.text)
-        timestamp = tweet.created_at
-        output = {'key': f'{searchTerm}', 'content': f'{tweet}' , 'timestamp': f'{timestamp}'}
-        print("--------------------")
+    def on_data(self, raw_data):
+        print('----------------------------------------')
+        data = json.loads(raw_data)
+        text = transform(data['data']['text'])
+        timestamp = data['data']['created_at']
+        output = {'key': f'{searchTerm}', 'content': f'{text}' , 'timestamp': f'{timestamp}'}
         print(output)
-        s3_upload('sallen-sentiment-source-bucket', searchTerm, output)
+        # s3_upload('sallen-sentiment-source-bucket', searchTerm, output)
         return True
 
     def on_error(self, status):
@@ -74,4 +76,4 @@ if stream.get_rules()[3]['result_count'] != 0:
 
 stream.add_rules(rule)
 
-stream.filter()
+stream.filter(tweet_fields='created_at')
