@@ -51,7 +51,8 @@ class MyStream(tweepy.StreamingClient):
         timestamp = data['data']['created_at']
         output = {'key': f'{searchTerm}', 'content': f'{text}' , 'timestamp': f'{timestamp}'}
         print(output)
-        # s3_upload('sallen-sentiment-source-bucket', searchTerm, output)
+        if is_aws:
+            s3_upload('sallen-sentiment-source-bucket', searchTerm, output)
         return True
 
     def on_error(self, status):
