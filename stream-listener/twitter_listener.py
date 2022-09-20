@@ -3,19 +3,15 @@
 import tweepy
 from dotenv import load_dotenv
 import os
-from kinesis_helper import KinesisStream
 from text_transform import transform
 import argparse
 import boto3
+from s3_upload import s3_upload
 # parse keyword to search from command
-def parse_arg():
-    
-    parser = argparse.ArgumentParser()
-    
-    parser.add_argument('--keyword', type=str, required=True)
-    
-    params = vars(parser.parse_args())
-    
+def parse_arg():    
+    parser = argparse.ArgumentParser()    
+    parser.add_argument('--keyword', type=str, required=True)    
+    params = vars(parser.parse_args())    
     return params
 
 if __name__ == '__main__':
@@ -33,13 +29,12 @@ if is_aws:
     bearer_token = client.get_parameter(
         Name='bearer_token',
         WithDecryption=True
-    )
+    )['Parameter']['Value']
+
+    print('BEARER TOKEN = ' + bearer_token)
 else:
     load_dotenv()
     bearer_token= os.getenv('bearer_token')
-
-# Name of the AWS Kinesis stream
-streamName = 'twitter-stream'
 
 class MyStream(tweepy.StreamingClient):
 
@@ -49,9 +44,9 @@ class MyStream(tweepy.StreamingClient):
     def on_tweet(self, tweet):
         tweet = transform(tweet.text)
         output = {'key': f'{searchTerm}', 'content': f'{tweet}'}
+        print("--------------------")
         print(output)
-        stream = KinesisStream(streamName)
-        stream.send_stream(data=output)
+        s3_upload('sallen-sentiment-source-bucket', searchTerm, output)
         return True
 
     def on_error(self, status):
