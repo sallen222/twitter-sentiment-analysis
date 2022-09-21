@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 import tweepy
 from dotenv import load_dotenv
 import os
@@ -24,7 +23,7 @@ bearer_token = ''
 
 # Check if code is being run on ec2
 is_aws = True if os.environ.get("AWS_DEFAULT_REGION") else False
-
+# Use ssm if on ec2
 if is_aws:
     client = boto3.client('ssm')
     bearer_token = client.get_parameter(
@@ -64,10 +63,12 @@ class MyStream(tweepy.StreamingClient):
             print('Authentication Error. Stopping stream.')
             return False
 
+# build filter rule
 rule = tweepy.StreamRule((f"{searchTerm} lang:en -is:retweet -is:reply"))
 
 stream = MyStream(bearer_token=bearer_token)
 
+# Delete old rules
 if stream.get_rules()[3]['result_count'] != 0:
         n_rules = stream.get_rules()[0]
         ids = [n_rules[i_tuple[0]][2] for i_tuple in enumerate(n_rules)]
