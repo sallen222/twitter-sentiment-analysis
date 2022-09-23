@@ -4,12 +4,12 @@ data "archive_file" "lambda-comprehend" {
   output_path = "lambda_comprehend.zip"
 }
 
-resource "aws_lambda_permission" "apigw-lambda-get" {
+resource "aws_lambda_permission" "lambda-comprehend-s3-permission" {
   statement_id  = "AllowS3Invoke"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.comprehend.function_name
   principal     = "s3.amazonaws.com"
-  source_arn    = "${aws_s3_bucket.source-bucket.arn}"
+  source_arn    = "arn:aws:s3:::${aws_s3_bucket.source-bucket.id}"
 }
 
 resource "aws_lambda_function" "comprehend" {
@@ -61,7 +61,6 @@ resource "aws_iam_policy" "lambda-role-policy-comprehend" {
         "s3:PutObjectTagging"
       ],
       "Resource": [
-        "${aws_s3_bucket.source-bucket.arn}",
         "${aws_s3_bucket.destination-bucket.arn}"
       ], 
       "Effect": "Allow",
@@ -84,4 +83,35 @@ POLICY
 resource "aws_iam_role_policy_attachment" "lambda-role-attachment-comprehend" {
   role       = aws_iam_role.lambda-role-comprehend.name
   policy_arn = aws_iam_policy.lambda-role-policy-comprehend.arn
+}
+
+resource "aws_cloudwatch_log_group" "lambda-comprehend-log-group" {
+  name = "/aws/lambda/${aws_lambda_function.comprehend.function_name}"
+  retention_in_days = 7
+}
+
+resource "aws_iam_policy" "comprehend-logging-policy" {
+  name = "comprehend-logging-policy"
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+      ],
+      "Resource": "arn:aws:logs:*:*:*",
+      "Effect": "Allow",
+      "Sid": "AllowLogging"
+    }
+  ]
+}
+POLICY
+}
+
+resource "aws_iam_role_policy_attachment" "function_logging_policy_attachment" {
+  role = aws_iam_role.lambda-role-comprehend.id
+  policy_arn = aws_iam_policy.comprehend-logging-policy.arn
 }
