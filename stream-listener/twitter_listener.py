@@ -7,6 +7,7 @@ import argparse
 import boto3
 from s3_upload import s3_upload
 import json
+
 # parse keyword to search from command
 def parse_arg():    
     parser = argparse.ArgumentParser()    
@@ -19,22 +20,8 @@ if __name__ == '__main__':
     global searchTerm
     searchTerm = params['keyword']
 
-bearer_token = ''
-
-# Check if code is being run on ec2
-is_aws = True if os.environ.get("AWS_DEFAULT_REGION") else False
-# Use ssm if on ec2
-if is_aws:
-    client = boto3.client('ssm')
-    bearer_token = client.get_parameter(
-        Name='bearer_token',
-        WithDecryption=True
-    )['Parameter']['Value']
-
-    print('BEARER TOKEN = ' + bearer_token)
-else:
-    load_dotenv()
-    bearer_token= os.getenv('bearer_token')
+load_dotenv()
+bearer_token= os.getenv('bearer_token')
 
 # Tweepy stream listener
 class MyStream(tweepy.StreamingClient):
@@ -45,12 +32,11 @@ class MyStream(tweepy.StreamingClient):
     def on_data(self, raw_data):
         print('----------------------------------------')
         data = json.loads(raw_data)
-        text = transform(data['data']['text'])
+        content = transform(data['data']['text'])
         timestamp = data['data']['created_at']
-        output = {'key': f'{searchTerm}', 'content': f'{text}' , 'timestamp': f'{timestamp}'}
+        output = {'key': f'{searchTerm}', 'content': f'{content}' , 'timestamp': f'{timestamp}'}
         print(output)
-        if is_aws:
-            s3_upload('sallen-sentiment-source-bucket', searchTerm, output)
+        s3_upload('sallen-sentiment-source-bucket', searchTerm, output)
         return True
 
     def on_error(self, status):
