@@ -1,11 +1,9 @@
 import boto3
 import json
-import random
 
 comprehendClient = boto3.client('comprehend')
 s3Client = boto3.client('s3')
 s3Resource = boto3.resource('s3')
-
 
 def lambda_handler(event, context):
     
@@ -14,14 +12,15 @@ def lambda_handler(event, context):
 
     object = s3Client.get_object(Bucket=eventBucket, Key=eventKey)
     objectContent = object['Body'].read().decode('utf-8')
-    print("TWEET CONTENT =" + objectContent)
+    print("TWEET CONTENT = " + objectContent)
 
+    objectContent = json.loads(objectContent)
     tweetKey = objectContent['key']
     tweetContent = objectContent['content']
     tweetTimestamp = objectContent['timestamp']
 
     sentiment=comprehendClient.detect_sentiment(Text=tweetContent,LanguageCode='en')['Sentiment']
-    print("SENTIMENT =" + sentiment)
+    print("SENTIMENT = " + sentiment)
 
     output = {'key': f'{tweetKey}', 'content': f'{tweetContent}', 'sentiment': f'{sentiment}', 'timestamp': f'{tweetTimestamp}'}
 
