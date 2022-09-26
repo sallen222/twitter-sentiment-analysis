@@ -43,37 +43,3 @@ resource "aws_s3_bucket_acl" "source-bucket-acl" {
   bucket = aws_s3_bucket.source-bucket.id
   acl    = "private"
 }
-
-resource "aws_s3_bucket" "destination-bucket" {
-  bucket = "sallen-sentiment-destination-bucket"
-}
-
-resource "aws_s3_bucket_policy" "destination-bucket-policy" {
-  bucket = aws_s3_bucket.destination-bucket.id
-  policy = <<POLICY
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Sid": "AllowS3Access",
-      "Effect": "Allow",
-      "Principal": {
-        "AWS": "${aws_iam_role.lambda-role-comprehend.arn}"
-      },
-      "Action": [
-        "s3:PutObject"
-      ],
-      "Resource": [
-        "${aws_s3_bucket.destination-bucket.arn}",
-        "${aws_s3_bucket.destination-bucket.arn}/*"
-      ]
-    }
-  ]
-}
-POLICY  
-}
-
-resource "aws_s3_bucket_acl" "destination-bucket-acl" {
-  bucket = aws_s3_bucket.destination-bucket.id
-  acl    = "private"
-}

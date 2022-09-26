@@ -55,25 +55,23 @@ resource "aws_iam_policy" "lambda-role-policy-comprehend" {
   "Statement": [
     {
       "Action": [
-        "s3:GetObject",
-        "s3:PutObject",
-        "s3:PutObjectAcl",
-        "s3:PutObjectTagging"
-      ],
-      "Resource": [
-        "${aws_s3_bucket.destination-bucket.arn}"
-      ], 
-      "Effect": "Allow",
-      "Sid": "AllowS3Access"
-    },
-    {
-      "Action": [
         "comprehend:DetectSentiment",
         "comprehend:DetectDominantLanguage"
       ],
       "Resource": "*",
       "Effect": "Allow",
       "Sid": "AllowComprehend"
+    },
+    {
+      "Action": [
+        "dynamodb:PutItem"
+      ],
+      "Resource": [
+        "${data.aws_dynamodb_table.sentiment-table.arn}"
+      ],
+      "Effect": "Allow",
+      "Sid": "AllowDynamoDB"    
+
     }
   ]
 }
