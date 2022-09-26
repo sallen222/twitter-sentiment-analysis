@@ -3,7 +3,7 @@ import json
 
 comprehendClient = boto3.client('comprehend')
 s3Client = boto3.client('s3')
-s3Resource = boto3.resource('s3')
+ddbResource = boto3.resource('dynamodb')
 
 def lambda_handler(event, context):
     
@@ -22,8 +22,10 @@ def lambda_handler(event, context):
     sentiment=comprehendClient.detect_sentiment(Text=tweetContent,LanguageCode='en')['Sentiment']
     print("SENTIMENT = " + sentiment)
 
-    output = {'key': f'{tweetKey}', 'content': f'{tweetContent}', 'sentiment': f'{sentiment}', 'timestamp': f'{tweetTimestamp}'}
+    ddbPutItem(tweetKey, tweetContent, sentiment, tweetTimestamp)
 
-    putBucket = s3Resource.Bucket('sallen-sentiment-destination-bucket')
+    s3Client.delete_object(Bucket=eventBucket, Key=eventKey)
 
-    putBucket.put_object(Key=f'{eventKey}', Body=json.dumps(output))
+def ddbPutItem(key, content, sentiment, timestamp):
+    table = ddbResource.Table('sentiment')
+    table.put_item(Item={'searchterm': key, 'timestamp': timestamp, 'sentiment': sentiment, 'content': content})
