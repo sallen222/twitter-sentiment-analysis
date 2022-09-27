@@ -19,7 +19,7 @@ def lambda_handler(event, context):
     tweetContent = objectContent['content']
     tweetTimestamp = objectContent['timestamp']
 
-    sentiment=comprehendClient.detect_sentiment(Text=tweetContent,LanguageCode='en')['Sentiment']
+    sentiment = comprehendClient.detect_sentiment(Text=tweetContent,LanguageCode='en')['Sentiment']
     print("SENTIMENT = " + sentiment)
 
     ddbPutItem(tweetKey, tweetContent, sentiment, tweetTimestamp)
