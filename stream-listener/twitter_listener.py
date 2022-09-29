@@ -4,7 +4,6 @@ from dotenv import load_dotenv
 import os
 from text_transform import transform
 import argparse
-import boto3
 from s3_upload import s3_upload
 import json
 
@@ -21,6 +20,7 @@ if __name__ == '__main__':
     searchTerm = params['keyword']
 
 load_dotenv()
+# Set bearer token to env variable
 bearer_token= os.getenv('bearer_token')
 
 # Tweepy stream listener
@@ -54,7 +54,7 @@ rule = tweepy.StreamRule((f"{searchTerm} lang:en -is:retweet -is:reply"))
 
 stream = MyStream(bearer_token=bearer_token)
 
-# Delete old rules
+# Delete old rules if they exist
 if stream.get_rules()[3]['result_count'] != 0:
         n_rules = stream.get_rules()[0]
         ids = [n_rules[i_tuple[0]][2] for i_tuple in enumerate(n_rules)]

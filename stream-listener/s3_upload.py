@@ -2,6 +2,7 @@ import boto3
 import random
 import json
 
+# Uploads objects to s3
 def s3_upload(bucket,searchTerm,data):
     key = f'{searchTerm}/{random.randint(100000000, 999999999)}'
     print('OBJECT KEY = ' + key)
