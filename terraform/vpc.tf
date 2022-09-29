@@ -32,11 +32,6 @@ resource "aws_security_group" "twitter-sg" {
   }
 }
 
-resource "aws_eip" "twitter-eip" {
-  instance = aws_instance.listener-instance.id
-  vpc      = true
-}
-
 resource "aws_internet_gateway" "twitter-vpc-gw" {
   vpc_id = aws_vpc.twitter-vpc.id
   tags = {
