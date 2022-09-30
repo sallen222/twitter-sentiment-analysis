@@ -22,7 +22,7 @@ def lambda_handler(event, context):
     tweetContent = objectContent['content']
     tweetTimestamp = objectContent['timestamp']
     
-    # Send the tweet content to comprehend for snetiment analysis
+    # Send the tweet content to comprehend for sentiment analysis
     sentiment = comprehendClient.detect_sentiment(Text=tweetContent,LanguageCode='en')['Sentiment']
     print("SENTIMENT = " + sentiment)
     
