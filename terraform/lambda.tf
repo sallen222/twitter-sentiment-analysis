@@ -2,7 +2,7 @@ data "archive_file" "lambda-comprehend" {
   type        = "zip"
   source_file = "../lambda/lambda_comprehend.py"
   output_path = "lambda_comprehend.zip"
-}
+} 
 
 resource "aws_lambda_permission" "lambda-comprehend-s3-permission" {
   statement_id  = "AllowS3Invoke"
