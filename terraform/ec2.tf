@@ -32,18 +32,11 @@ resource "aws_instance" "listener-instance" {
 
   security_groups = [aws_security_group.twitter-sg.id]
 
-  user_data = <<EOF
-    #!/bin/bash
-    sudo apt-get update -y
-    sudo apt-get upgrade -y
-    sudo apt-get install python3 -y
-    sudo apt-get install python3-pip -y
-    sudo apt-get install git -y
-    sudo pip3 install tweepy boto3 python-dotenv
-    git clone https://github.com/sallen222/twitter-sentiment-analysis /home/ubuntu/twitter-sentiment-analysis
-    cd /home/ubuntu/twitter-sentiment-analysis/stream-listener
-    chmod +x twitter_listener.py
-EOF
+  user_data = "${file("user_data.sh")}"
+
+  tags = {
+    Name = "listener-instance"
+  }
 }
 
 resource "aws_iam_policy" "ec2-policy" {
