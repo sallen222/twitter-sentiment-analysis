@@ -84,12 +84,12 @@ resource "aws_iam_role_policy_attachment" "lambda-role-attachment-comprehend" {
 }
 
 resource "aws_cloudwatch_log_group" "lambda-comprehend-log-group" {
-  name = "/aws/lambda/${aws_lambda_function.comprehend.function_name}"
+  name              = "/aws/lambda/${aws_lambda_function.comprehend.function_name}"
   retention_in_days = 7
 }
 
 resource "aws_iam_policy" "comprehend-logging-policy" {
-  name = "comprehend-logging-policy"
+  name   = "comprehend-logging-policy"
   policy = <<POLICY
 {
   "Version": "2012-10-17",
@@ -110,6 +110,6 @@ POLICY
 }
 
 resource "aws_iam_role_policy_attachment" "function_logging_policy_attachment" {
-  role = aws_iam_role.lambda-role-comprehend.id
+  role       = aws_iam_role.lambda-role-comprehend.id
   policy_arn = aws_iam_policy.comprehend-logging-policy.arn
 }
